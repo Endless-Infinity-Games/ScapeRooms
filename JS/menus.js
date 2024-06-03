@@ -1,5 +1,5 @@
 // Configuración del juego Phaser
-const config = {
+/*const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
@@ -8,9 +8,9 @@ const config = {
         create: create,
         update: update
     }
-};
+};*/
 
-const game = new Phaser.Game(config);
+//const game = new Phaser.Game(config);
 
 function preload() {
     // Aquí puedes cargar tus recursos
@@ -27,8 +27,8 @@ function update() {
 
 // Lógica del menú
 document.getElementById('start-game').addEventListener('click', () => {
-    document.getElementById('menu').style.display = 'none';
-    game.scene.start('default');
+
+    window.location.assign("../html/phasergame.html");
 });
 
 document.getElementById('settings').addEventListener('click', () => {
