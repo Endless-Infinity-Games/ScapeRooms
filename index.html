@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.js"></script>
-    <script src="./JS/main.js" type=module></script>
+    <title> The Escapist</title>
+    <link rel="stylesheet" href="CSS\menu.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    
+    <div id="menu">
+        <button class="menu-button" id="start-game">Start Game</button>
+        <button class="menu-button" id="settings">Settings</button>
+        <button class="menu-button" id="credits">Credits</button>
+    </div>
+    <script src="node_modules/phaser/dist/phaser.js"></script>
+    <script src="JS\menus.js"></script>
 </body>
 </html>
+
+
