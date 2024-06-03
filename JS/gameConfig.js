@@ -23,11 +23,13 @@ var objects;
 var maskGraphics;
 var lightMask;
 
+
 let keyA, keyS, keyD, keyW;
 
 var game = new Phaser.Game(config);
 
-function preload() {
+function preload ()
+{
     this.load.image('sky', '/assets/sky.png');
     this.load.image('ground', '/assets/platform.png');
     this.load.image('star', '/assets/star.png');
@@ -36,11 +38,13 @@ function preload() {
     this.load.spritesheet('police', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 }); // Usar un sprite diferente para el policía si lo tienes
 }
 
+
 function create() {
     // Añadir el fondo y las plataformas
     this.add.image(400, 300, 'sky');
     platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
@@ -51,6 +55,7 @@ function create() {
     player.setCollideWorldBounds(true);
 
     // Añadir las animaciones del jugador
+
     this.anims.create({
         key: 'left',
         frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
@@ -74,6 +79,7 @@ function create() {
     // Añadir los policías
     police = this.physics.add.group();
     addPolice(400, 300, 100, this); // Añade un policía en la posición (400, 300) con una distancia de patrulla de 100 píxeles
+
 
     // Añadir los objetos a recoger
     objects = this.physics.add.group({
@@ -148,6 +154,7 @@ function update() {
         child.light.y = child.y;
     });
 }
+
 
 function addPolice(x, y, distance, scene) {
     var policeOfficer = scene.physics.add.sprite(x, y, 'police');
