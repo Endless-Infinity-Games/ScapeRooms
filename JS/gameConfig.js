@@ -1,13 +1,8 @@
 
-
-
-
-
-
 export const config = {
     type: Phaser.AUTO,
-    width: 3000,
-    height: 2800,
+    width: 800,
+    height: 600,
     physics: {
         default: 'arcade',
         arcade: {
@@ -30,10 +25,7 @@ let keyA;
     let keyD;
     let keyW;
 
-
 var game = new Phaser.Game(config);
-
-
 
 
 function preload ()
@@ -47,25 +39,27 @@ function preload ()
 
 function create ()
 {
-
+    //tecles per a controlar el personatge
     keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
-    this.add.image(400, 300, 'sky');
+    this.add.image(0, 0, 'sky').setOrigin(0,0);
 
     platforms = this.physics.add.staticGroup();
 
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(400, 800, 'ground').setScale(2).refreshBody();
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
 
-    player = this.physics.add.sprite(800, 450, 'dude').setScrollFactor(0);
+    player = this.physics.add.sprite(100, 200, 'dude').setScrollFactor(0);
 
-    //player.setBounce(0.2);
+    player.setBounce(0.2);
     player.setCollideWorldBounds(true);
+
+
 
     this.anims.create({
         key: 'left',
@@ -89,35 +83,12 @@ function create ()
 
     cursors = this.input.keyboard.createCursorKeys();
 
-     //  From here down is just camera controls and feedback
+     // Creem la camera i fem que segueixi al jugador
 
-     var controlConfig = {
-         camera: this.cameras.main,
-         left: cursors.left,
-         right: cursors.right,
-         up: cursors.up,
-         down: cursors.down,
-         acceleration: 0.06,
-         drag: 0.0005,
-         maxSpeed: 1.0
-     };
-
-     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
-
-     var cam = this.cameras.main;
-
-     const gui = new dat.GUI();
-
-
-
-     var f1 = gui.addFolder('Camera');
-     f1.add(cam, 'x').listen();
-     f1.add(cam, 'y').listen();
-     f1.add(cam, 'scrollX').listen();
-     f1.add(cam, 'scrollY').listen();
-     f1.add(cam, 'rotation').min(0).step(0.01).listen();
-     f1.add(help, 'line1');
-     f1.open();
+    //BUG AMB CAMERA al implementar la camara que segueix el jugador, el joc dibuixar els coliders desplacats
+    this.cameras.main.setBounds(0,0, 1600,800);
+    this.cameras.main.startFollow(player);
+   // this.physics.world.setBounds(0,0, 1600, 800)
 
     this.physics.add.collider(player, platforms);
 }
@@ -126,24 +97,24 @@ function update ()
 {
     if (keyA.isDown)
     {
-        player.setVelocityX(-500);
+        player.setVelocityX(-160);
 
         player.anims.play('left', true);
     }
     else if (keyD.isDown)
     {
-        player.setVelocityX(600);
+        player.setVelocityX(160);
 
         player.anims.play('right', true);
     }
     else if (keyW.isDown)
     {
-        player.setVelocityY(-100);
+        player.setVelocityY(-160);
 
     }
     else if (keyS.isDown)
     {
-        player.setVelocityY(800);
+        player.setVelocityY(160);
 
     }
     else
