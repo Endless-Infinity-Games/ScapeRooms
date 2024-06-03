@@ -1,8 +1,13 @@
 
+
+
+
+
+
 export const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 3000,
+    height: 2800,
     physics: {
         default: 'arcade',
         arcade: {
@@ -28,6 +33,9 @@ let keyA;
 
 var game = new Phaser.Game(config);
 
+
+
+
 function preload ()
 {
     this.load.image('sky', '/assets/sky.png');
@@ -50,14 +58,13 @@ function create ()
     platforms = this.physics.add.staticGroup();
 
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
 
-    player = this.physics.add.sprite(100, 450, 'dude');
+    player = this.physics.add.sprite(800, 450, 'dude').setScrollFactor(0);
 
-    player.setBounce(0.2);
+    //player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
     this.anims.create({
@@ -82,6 +89,36 @@ function create ()
 
     cursors = this.input.keyboard.createCursorKeys();
 
+     //  From here down is just camera controls and feedback
+
+     var controlConfig = {
+         camera: this.cameras.main,
+         left: cursors.left,
+         right: cursors.right,
+         up: cursors.up,
+         down: cursors.down,
+         acceleration: 0.06,
+         drag: 0.0005,
+         maxSpeed: 1.0
+     };
+
+     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
+
+     var cam = this.cameras.main;
+
+     const gui = new dat.GUI();
+
+
+
+     var f1 = gui.addFolder('Camera');
+     f1.add(cam, 'x').listen();
+     f1.add(cam, 'y').listen();
+     f1.add(cam, 'scrollX').listen();
+     f1.add(cam, 'scrollY').listen();
+     f1.add(cam, 'rotation').min(0).step(0.01).listen();
+     f1.add(help, 'line1');
+     f1.open();
+
     this.physics.add.collider(player, platforms);
 }
 
@@ -89,13 +126,13 @@ function update ()
 {
     if (keyA.isDown)
     {
-        player.setVelocityX(-160);
+        player.setVelocityX(-500);
 
         player.anims.play('left', true);
     }
     else if (keyD.isDown)
     {
-        player.setVelocityX(160);
+        player.setVelocityX(600);
 
         player.anims.play('right', true);
     }
@@ -106,7 +143,7 @@ function update ()
     }
     else if (keyS.isDown)
     {
-        player.setVelocityY(100);
+        player.setVelocityY(800);
 
     }
     else
