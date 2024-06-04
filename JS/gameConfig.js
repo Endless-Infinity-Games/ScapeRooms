@@ -22,8 +22,9 @@ var cursors;
 var objects;
 var maskGraphics;
 var lightMask;
+var coneColl;
 var angle;
-
+var lightCircle;
 
 let keyA, keyS, keyD, keyW;
 
@@ -69,9 +70,10 @@ function create() {
 
     // Añadir el jugador
     player = this.physics.add.sprite(100, 450, 'dude');
-    player.setOrigin(2.7,0.5); //Ajustar centro del personaje
-    player.setBounce(0.2);
+    player.setOrigin(0.5,0.5); //Ajustar centro del personaje
+    player.setBounce(0);
     player.setCollideWorldBounds(true);
+    player.body.setAllowGravity(false);
 
     // Añadir las animaciones del jugador
 
@@ -98,7 +100,7 @@ function create() {
     // Añadir los policías
     police = this.physics.add.group();
     addPolice(400, 300, 100, this); // Añade un policía en la posición (400, 300) con una distancia de patrulla de 100 píxeles
-
+    addPolice(300, 500, 200, this);
 
     // Añadir los objetos a recoger
     objects = this.physics.add.group({
@@ -116,7 +118,7 @@ function create() {
     this.physics.add.collider(police, platforms);
     this.physics.add.collider(objects, platforms);
     this.physics.add.overlap(player, objects, collectObject, null, this);
-    this.physics.add.overlap(player, police, restartGame, null, this);
+   
 
     // Configurar teclas
     cursors = this.input.keyboard.createCursorKeys();
@@ -127,45 +129,59 @@ function create() {
 
     // Añadir la máscara de luz
      
+
+
     lightMask = this.make.graphics();
-    lightMask.fillStyle(0xffffff, 1);
-    lightMask.fillCircle(0, 0, 100);
-    let maskTexture = lightMask.generateTexture('light', 100, 100);
+    lightMask.fillStyle(0xffffff, 0.3);
+    lightMask.fillCircle(150, 150, 150);
+    let maskTexture = lightMask.generateTexture('light', 300, 300);
     lightMask.destroy();
 
-
-    // Añadir máscara de luz al jugador
     let light = this.add.image(player.x, player.y, 'light');
-    
     light.setOrigin(0.5,0.5);
     light.setAlpha(0.8);
-    light.setAngle(-45); //Canvi angle per la llum
-
+    light.setAngle(-45);
     player.light = light;
-    
 
-    // Añadir máscara de luz a los policías
-    police.children.iterate(function (child) {
-        let policeLight = this.add.image(child.x, child.y, 'light');
-        policeLight.setAlpha(0.8);
-        policeLight.setAngle(-45); //Canviar el angle 
-        child.light = policeLight;
-    }, this);
+   
+
+    police.children.iterate(function (policeOfficer) {
+        let coneGraphics = policeOfficer.scene.add.graphics();
+        coneGraphics.fillStyle(0xffffff, 0.2);
+        coneGraphics.slice(0, 0, 150, Phaser.Math.DegToRad(-45), Phaser.Math.DegToRad(45), false);
+        coneGraphics.fillPath();
+        policeOfficer.cone = coneGraphics;
+     
+
+    });
+
+  
+
+
 }
 
 function update() {
+    player.setVelocity(0);
     // Movimiento del jugador
     if (cursors.left.isDown || keyA.isDown) {
         player.setVelocityX(-160);
         player.anims.play('left', true);
-        //player.light.setFlipX(true); //Giramos la luz del jugador
-        player.light.setAngle(130);
+       
+        
 
     } else if (cursors.right.isDown || keyD.isDown) {
         player.setVelocityX(160);
         player.anims.play('right', true);
-        //player.light.setFlipX(false); //Giramos la luz del jugador
-        player.light.setAngle(-45);
+        
+        
+        
+    }else if (cursors.up.isDown || keyW.isDown) {
+            player.setVelocityY(-160);
+        
+        
+    } else if (cursors.down.isDown || keyS.isDown) {
+            player.setVelocityY(160);
+        
         
     } else {
         player.setVelocityX(0);
@@ -177,17 +193,23 @@ function update() {
     }
 
     // Actualizar la posición de la luz del jugador
+    /*lightCircle.x= player.x;
+    lightCircle.y= player.y;
+    console.log(lightCircle.x,player.x);*/
     player.light.x = player.x;
     player.light.y = player.y;
 
 
+    police.children.iterate(function (policeOfficer) {
+        patrol(policeOfficer);
+        // Actualizar la posición y ángulo del cono
 
-    // Movimiento de los policías
-    police.children.iterate(function (child) {
-        patrol(child);
-        child.light.x = child.x;
-        child.light.y = child.y;
+        policeOfficer.cone.x = policeOfficer.x;
+        policeOfficer.cone.y = policeOfficer.y;
+        //policeOfficer.cone.rotation = policeOfficer.angle; // Ajustar rotación
     });
+
+
 }
 
 
@@ -225,20 +247,27 @@ function addPolice(x, y, distance, scene) {
 }
 
 function patrol(policeOfficer) {
+  
+
     if (policeOfficer.direction === 1 && policeOfficer.x >= policeOfficer.startX + policeOfficer.distance) {
         policeOfficer.direction = -1;
-        policeOfficer.light.setAngle(135); //Rotar angle
+        policeOfficer.cone.setAngle(-180); // Rotar ángulo
+         
     } else if (policeOfficer.direction === -1 && policeOfficer.x <= policeOfficer.startX - policeOfficer.distance) {
         policeOfficer.direction = 1;
-        policeOfficer.light.setAngle(-45); //Rotar angle
+        policeOfficer.cone.setAngle(0); // Rotar ángulo
     }
 
     policeOfficer.setVelocityX(100 * policeOfficer.direction);
     if (policeOfficer.direction === 1) {
         policeOfficer.anims.play('police_right', true);
+      
     } else {
         policeOfficer.anims.play('police_left', true);
+       
     }
+
+    
 }
 
 function collectObject(player, object) {
