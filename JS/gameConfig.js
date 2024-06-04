@@ -22,6 +22,7 @@ var cursors;
 var objects;
 var maskGraphics;
 var lightMask;
+var angle;
 
 
 let keyA, keyS, keyD, keyW;
@@ -51,6 +52,7 @@ function create() {
 
     // Añadir el jugador
     player = this.physics.add.sprite(100, 450, 'dude');
+    player.setOrigin(2.7,0.5); //Ajustar centro del personaje
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
 
@@ -107,21 +109,29 @@ function create() {
     keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
     // Añadir la máscara de luz
+     
     lightMask = this.make.graphics();
     lightMask.fillStyle(0xffffff, 1);
     lightMask.fillCircle(0, 0, 100);
-    let maskTexture = lightMask.generateTexture('light', 200, 200);
+    let maskTexture = lightMask.generateTexture('light', 100, 100);
     lightMask.destroy();
+
 
     // Añadir máscara de luz al jugador
     let light = this.add.image(player.x, player.y, 'light');
+    
+    light.setOrigin(0.5,0.5);
     light.setAlpha(0.8);
+    light.setAngle(-45); //Canvi angle per la llum
+
     player.light = light;
+    
 
     // Añadir máscara de luz a los policías
     police.children.iterate(function (child) {
         let policeLight = this.add.image(child.x, child.y, 'light');
         policeLight.setAlpha(0.8);
+        policeLight.setAngle(-45); //Canviar el angle 
         child.light = policeLight;
     }, this);
 }
@@ -131,9 +141,15 @@ function update() {
     if (cursors.left.isDown || keyA.isDown) {
         player.setVelocityX(-160);
         player.anims.play('left', true);
+        //player.light.setFlipX(true); //Giramos la luz del jugador
+        player.light.setAngle(130);
+
     } else if (cursors.right.isDown || keyD.isDown) {
         player.setVelocityX(160);
         player.anims.play('right', true);
+        //player.light.setFlipX(false); //Giramos la luz del jugador
+        player.light.setAngle(-45);
+        
     } else {
         player.setVelocityX(0);
         player.anims.play('turn');
@@ -146,6 +162,8 @@ function update() {
     // Actualizar la posición de la luz del jugador
     player.light.x = player.x;
     player.light.y = player.y;
+
+
 
     // Movimiento de los policías
     police.children.iterate(function (child) {
@@ -192,8 +210,10 @@ function addPolice(x, y, distance, scene) {
 function patrol(policeOfficer) {
     if (policeOfficer.direction === 1 && policeOfficer.x >= policeOfficer.startX + policeOfficer.distance) {
         policeOfficer.direction = -1;
+        policeOfficer.light.setAngle(135); //Rotar angle
     } else if (policeOfficer.direction === -1 && policeOfficer.x <= policeOfficer.startX - policeOfficer.distance) {
         policeOfficer.direction = 1;
+        policeOfficer.light.setAngle(-45); //Rotar angle
     }
 
     policeOfficer.setVelocityX(100 * policeOfficer.direction);
