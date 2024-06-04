@@ -44,11 +44,28 @@ function create() {
     // Añadir el fondo y las plataformas
     this.add.image(400, 300, 'sky');
     platforms = this.physics.add.staticGroup();
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
+    //platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(300, 748, 'ground').setAngle(90);
+    platforms.create(400, 412, 'ground').setAngle(90);
+    platforms.create(44, 248, 'ground');
+    platforms.create(140, -15, 'ground').setAngle(90);
+    platforms.create(400, 748, 'ground').setAngle(90);
+    platforms.create(510, 148, 'ground');
+    platforms.create(650, 228, 'ground');
+    platforms.create(300, 638, 'ground').setAngle(90);
+    platforms.create(300, 198, 'ground').setAngle(90);
+    platforms.create(600, 564, 'ground');
+    platforms.create(100, 564, 'ground');
+    platforms.create(16, 364, 'ground').setAngle(90);
+    platforms.create(16, 164, 'ground').setAngle(90);
+    platforms.create(784, 364, 'ground').setAngle(90);
+    platforms.create(784, 164, 'ground').setAngle(90);
+    platforms.create(600, 10, 'ground');
+    platforms.create(200, 10, 'ground');
+    //platforms.create(600, 400, 'ground');
+    //platforms.create(50, 250, 'ground');
+    //platforms.create(750, 220, 'ground');
+    //platforms.create(400, 100, 'ground');
 
     // Añadir el jugador
     player = this.physics.add.sprite(100, 450, 'dude');
