@@ -187,6 +187,10 @@ function create() {
         // Ajustar el tamaño del cuerpo de colisión del cono
         policeOfficer.cone.body.setSize(300, 300); // Ajusta el tamaño según sea necesario
         policeOfficer.cone.body.setOffset(300, 150); // Ajusta el offset según sea necesario
+        
+
+
+
              
 
 
@@ -242,6 +246,7 @@ function update() {
 
         policeOfficer.cone.x = policeOfficer.x;
         policeOfficer.cone.y = policeOfficer.y;
+
         
         
         //policeOfficer.cone.rotation = policeOfficer.angle; // Ajustar rotación
@@ -309,13 +314,15 @@ function patrol(policeOfficer) {
     if (policeOfficer.direction === 1 && policeOfficer.x >= policeOfficer.startX + policeOfficer.distance) {
         policeOfficer.direction = -1;
         policeOfficer.cone.setAngle(0); // Rotar ángulo
+        policeOfficer.cone.body.setOffset(-160, 150)
         
 
         //policeOfficer.cone.body.x = 300;
          
     } else if (policeOfficer.direction === -1 && policeOfficer.x <= policeOfficer.startX - policeOfficer.distance) {
         policeOfficer.direction = 1;
-        policeOfficer.cone.setAngle(180); // Rotar ángulo
+        policeOfficer.cone.setAngle(180); // Rotar 
+        policeOfficer.cone.body.setOffset(300, 150)
        // policeOfficer.cone.body.x = 300;
     }
 
