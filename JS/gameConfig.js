@@ -15,6 +15,11 @@ export const config = {
     }
 };
 
+// Texto al completar el nivel
+
+
+
+
 var player;
 var police;
 var platforms;
@@ -22,6 +27,11 @@ var cursors;
 var objects;
 var lightMask;
 var darkness;
+let starsCollected = 0;
+let totalStars = 0;
+var completeText;
+
+
 
 let keyA, keyS, keyD, keyW;
 
@@ -68,6 +78,7 @@ function create() {
     platforms.create(16, 164, 'groundVertical').refreshBody();
 
     
+    
     // Añadir el jugador
     player = this.physics.add.sprite(100, 450, 'dude');
     player.setOrigin(0.5,0.5); //Ajustar centro del personaje
@@ -104,15 +115,30 @@ function create() {
     addPolice(500, 175, 120, this);
     addPolice(150, 200, 90, this);
 
-    // Añadir los objetos a recoger
+    // Lista de posiciones específicas
+    const starPositions = [
+        { x: 100, y: 500 }/*
+        { x: 200, y: 150 },
+        { x: 350, y: 50 },
+        { x: 450, y: 250 },
+        { x: 500, y: 300 },
+        { x: 600, y: 350 }*/
+    ];
+
     objects = this.physics.add.group({
         key: 'star',
-        repeat: 10,
-        setXY: { x: 12, y: 0, stepX: 70 }
+        repeat: starPositions.length - 1, // -1 porque ya contamos el primer objeto en 'key'
+        setXY: { x: 0, y: 0, stepX: 0 } // Esto se ignorará, pero es necesario
     });
 
+    let i = 0;
     objects.children.iterate(function(child) {
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+        if (starPositions[i]) {
+            child.setPosition(starPositions[i].x, starPositions[i].y);
+            totalStars++;
+        }
+        i++;
     });
 
     // Añadir colisiones
@@ -189,7 +215,9 @@ function create() {
 
  
     }, this);
-
+    //Texto al ganar la partida
+    completeText = this.add.text(400, 300, 'Level Complete!', { fontSize: '32px', fill: '#ffffff' });
+    completeText.setAlpha(0);
 
 }
 
@@ -255,6 +283,15 @@ function createWall(scene, x, y, isVertical) {
     wallImage.setOrigin(0.5, 0.5);
 }
 
+function addStar(x,y,scene) {
+
+    var starObj = scene.physics.add.sprite(x,y, 'star');
+    starObj.setBounce(0.2);
+    starObj.setCollideWorldBounds(true);
+    starObj.startX = x;
+    starObj.startY = y;
+
+}
 
 function addPolice(x, y, distance, scene) {
     var policeOfficer = scene.physics.add.sprite(x, y, 'police');
@@ -317,13 +354,26 @@ function patrol(policeOfficer) {
 
 function collectObject(player, object) {
     object.disableBody(true, true);
+    starsCollected += 1;
+
+    if (starsCollected === totalStars) {
+        levelComplete();
+    }
     // Lógica para manejar la recolección del objeto
 }
 
-
-
-
-
+function levelComplete() {
+    console.log("nivell completat");
+    // Muestra un mensaje o realiza alguna acción para indicar que el nivel se completó
+   
+    completeText.setOrigin(0.5, 0.5);
+    completeText.setAlpha(1);
+    
+    // Aquí podrías agregar lógica para avanzar al siguiente nivel o reiniciar el nivel
+    setTimeout(() => {
+        window.history.back(); // Esto hará que la página vuelva a la página anterior en el historial del navegador
+    }, 1000);
+}
 function restartGame(player, policeOfficer) {
     // Lógica para reiniciar el juego
     player.setTint(0xff0000);
