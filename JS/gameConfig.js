@@ -5,7 +5,7 @@ export const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false
+            debug: true
         }
     },
     scene: {
@@ -36,6 +36,8 @@ function preload ()
     this.load.image('ground', '/assets/platform.png');
     this.load.image('star', '/assets/star.png');
     this.load.image('bomb', '/assets/bomb.png');
+    this.load.image('cone', '/assets/cone.png');
+    
     this.load.spritesheet('dude', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('police', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 }); // Usar un sprite diferente para el policía si lo tienes
 }
@@ -46,23 +48,23 @@ function create() {
     this.add.image(400, 300, 'sky');
     platforms = this.physics.add.staticGroup();
     //platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-    platforms.create(300, 748, 'ground').setAngle(90);
-    platforms.create(400, 412, 'ground').setAngle(90);
-    platforms.create(44, 248, 'ground');
-    platforms.create(140, -15, 'ground').setAngle(90);
-    platforms.create(400, 748, 'ground').setAngle(90);
-    platforms.create(510, 148, 'ground');
-    platforms.create(650, 228, 'ground');
-    platforms.create(300, 638, 'ground').setAngle(90);
-    platforms.create(300, 198, 'ground').setAngle(90);
-    platforms.create(600, 564, 'ground');
-    platforms.create(100, 564, 'ground');
-    platforms.create(16, 364, 'ground').setAngle(90);
-    platforms.create(16, 164, 'ground').setAngle(90);
-    platforms.create(784, 364, 'ground').setAngle(90);
-    platforms.create(784, 164, 'ground').setAngle(90);
-    platforms.create(600, 10, 'ground');
-    platforms.create(200, 10, 'ground');
+    platforms.create(300, 748, 'ground').setAngle(90).refreshBody();
+    platforms.create(400, 412, 'ground').setAngle(90).refreshBody();
+    platforms.create(44, 248, 'ground').refreshBody();
+    platforms.create(140, -15, 'ground').setAngle(90).refreshBody();
+    platforms.create(400, 748, 'ground').setAngle(90).refreshBody();
+    platforms.create(510, 148, 'ground').refreshBody();
+    platforms.create(650, 228, 'ground').refreshBody();
+    platforms.create(300, 638, 'ground').setAngle(90).refreshBody();
+    platforms.create(300, 198, 'ground').setAngle(90).refreshBody();
+    platforms.create(600, 564, 'ground').refreshBody();
+    platforms.create(100, 564, 'ground').refreshBody();
+    platforms.create(16, 364, 'ground').setAngle(90).refreshBody();
+    platforms.create(16, 164, 'ground').setAngle(90).refreshBody();
+    platforms.create(784, 364, 'ground').setAngle(90).refreshBody();
+    platforms.create(784, 164, 'ground').setAngle(90).refreshBody();
+    platforms.create(600, 10, 'ground').refreshBody();
+    platforms.create(200, 10, 'ground').refreshBody();
     //platforms.create(600, 400, 'ground');
     //platforms.create(50, 250, 'ground');
     //platforms.create(750, 220, 'ground');
@@ -119,6 +121,7 @@ function create() {
     this.physics.add.collider(objects, platforms);
     this.physics.add.overlap(player, objects, collectObject, null, this);
    
+    this.physics.add.overlap(player, police, restartGame, null, this);
 
     // Configurar teclas
     cursors = this.input.keyboard.createCursorKeys();
@@ -143,19 +146,41 @@ function create() {
     light.setAngle(-45);
     player.light = light;
 
-   
-
     police.children.iterate(function (policeOfficer) {
+        
+        //Cono dibujado
+        /*
         let coneGraphics = policeOfficer.scene.add.graphics();
         coneGraphics.fillStyle(0xffffff, 0.2);
         coneGraphics.slice(0, 0, 150, Phaser.Math.DegToRad(-45), Phaser.Math.DegToRad(45), false);
         coneGraphics.fillPath();
         policeOfficer.cone = coneGraphics;
-     
+*/
+        //Imagen de un cono
+        policeOfficer.cone = policeOfficer.scene.physics.add.image(policeOfficer.x, policeOfficer.y, 'cone');
+        policeOfficer.cone.setOrigin(1, 0.5);
+        policeOfficer.cone.setScale(0.2);
+        policeOfficer.cone.setAlpha(0.5); // Ajusta la opacidad según sea necesario
+        policeOfficer.cone.body.setAllowGravity(false);
+        policeOfficer.cone.body.setImmovable(true);
+        policeOfficer.cone.body.setAllowRotation(true);
 
-    });
+        policeOfficer.cone.setAngle(180); // Rotar ángulo
 
-  
+        // Ajustar el tamaño del cuerpo de colisión del cono
+        policeOfficer.cone.body.setSize(300, 300); // Ajusta el tamaño según sea necesario
+        policeOfficer.cone.body.setOffset(300, 150); // Ajusta el offset según sea necesario
+             
+
+
+                
+        this.physics.add.overlap(player, policeOfficer.cone, restartGame, null, this);
+
+ 
+    }, this);
+
+    
+   
 
 
 }
@@ -167,22 +192,16 @@ function update() {
         player.setVelocityX(-160);
         player.anims.play('left', true);
        
-        
-
     } else if (cursors.right.isDown || keyD.isDown) {
         player.setVelocityX(160);
         player.anims.play('right', true);
         
-        
-        
     }else if (cursors.up.isDown || keyW.isDown) {
             player.setVelocityY(-160);
-        
-        
+
     } else if (cursors.down.isDown || keyS.isDown) {
             player.setVelocityY(160);
-        
-        
+    
     } else {
         player.setVelocityX(0);
         player.anims.play('turn');
@@ -206,6 +225,8 @@ function update() {
 
         policeOfficer.cone.x = policeOfficer.x;
         policeOfficer.cone.y = policeOfficer.y;
+        
+        
         //policeOfficer.cone.rotation = policeOfficer.angle; // Ajustar rotación
     });
 
@@ -251,11 +272,15 @@ function patrol(policeOfficer) {
 
     if (policeOfficer.direction === 1 && policeOfficer.x >= policeOfficer.startX + policeOfficer.distance) {
         policeOfficer.direction = -1;
-        policeOfficer.cone.setAngle(-180); // Rotar ángulo
+        policeOfficer.cone.setAngle(0); // Rotar ángulo
+        
+
+        //policeOfficer.cone.body.x = 300;
          
     } else if (policeOfficer.direction === -1 && policeOfficer.x <= policeOfficer.startX - policeOfficer.distance) {
         policeOfficer.direction = 1;
-        policeOfficer.cone.setAngle(0); // Rotar ángulo
+        policeOfficer.cone.setAngle(180); // Rotar ángulo
+       // policeOfficer.cone.body.x = 300;
     }
 
     policeOfficer.setVelocityX(100 * policeOfficer.direction);
