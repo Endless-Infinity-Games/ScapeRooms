@@ -100,8 +100,9 @@ function create() {
 
     // Añadir los policías
     police = this.physics.add.group();
-    addPolice(400, 300, 100, this); // Añade un policía en la posición (400, 300) con una distancia de patrulla de 100 píxeles
-    addPolice(300, 500, 200, this);
+    addPolice(600, 500, 100, this); // Añade un policía en la posición (400, 300) con una distancia de patrulla de 100 píxeles
+    addPolice(500, 175, 120, this);
+    addPolice(150, 200, 90, this);
 
     // Añadir los objetos a recoger
     objects = this.physics.add.group({
@@ -142,14 +143,10 @@ function create() {
 
     let light = this.add.image(player.x, player.y, 'light');
     light.setOrigin(0.5,0.5);
-    light.setDepth(1); // Asegura que la máscara esté encima de los otros elementos
-    light.setAlpha(0.8);
+    light.setDepth(2); // Asegura que la máscara esté encima de los otros elementos
+    light.setAlpha(0.5);
     light.setAngle(-45);
     player.light = light;
-
-
-
-
     
 
 
@@ -157,7 +154,7 @@ function create() {
     darkness = this.add.graphics();
     darkness.fillStyle(0x000000); // Color negro
     darkness.fillRect(0, 0, config.width, config.height);
-    darkness.setAlpha(0.9); // Ajusta la opacidad del rectángulo según sea necesario
+    darkness.setAlpha(0.8); // Ajusta la opacidad del rectángulo según sea necesario
     darkness.setDepth(0); // Asegura que esté detrás de los otros elementos
 
 
@@ -187,21 +184,11 @@ function create() {
         // Ajustar el tamaño del cuerpo de colisión del cono
         policeOfficer.cone.body.setSize(300, 300); // Ajusta el tamaño según sea necesario
         policeOfficer.cone.body.setOffset(300, 150); // Ajusta el offset según sea necesario
-        
-
-
-
-             
-
-
                 
         this.physics.add.overlap(player, policeOfficer.cone, restartGame, null, this);
 
  
     }, this);
-
-    
-   
 
 
 }
@@ -246,18 +233,12 @@ function update() {
 
         policeOfficer.cone.x = policeOfficer.x;
         policeOfficer.cone.y = policeOfficer.y;
-
-        
         
         //policeOfficer.cone.rotation = policeOfficer.angle; // Ajustar rotación
 
     }, this);
 
-
 }
-
-
-
 
 function createWall(scene, x, y, isVertical) {
     const wall = scene.physics.add.staticImage(x, y, 'ground');
@@ -315,18 +296,14 @@ function patrol(policeOfficer) {
         policeOfficer.direction = -1;
         policeOfficer.cone.setAngle(0); // Rotar ángulo
         policeOfficer.cone.body.setOffset(-160, 150)
-        
-
-        //policeOfficer.cone.body.x = 300;
          
     } else if (policeOfficer.direction === -1 && policeOfficer.x <= policeOfficer.startX - policeOfficer.distance) {
         policeOfficer.direction = 1;
         policeOfficer.cone.setAngle(180); // Rotar 
         policeOfficer.cone.body.setOffset(300, 150)
-       // policeOfficer.cone.body.x = 300;
     }
-
-    policeOfficer.setVelocityX(100 * policeOfficer.direction);
+    //Velocidad que alcanzan los policias
+    policeOfficer.setVelocityX(30 * policeOfficer.direction);
     if (policeOfficer.direction === 1) {
         policeOfficer.anims.play('police_right', true);
       
