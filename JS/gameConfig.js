@@ -20,11 +20,8 @@ var police;
 var platforms;
 var cursors;
 var objects;
-var maskGraphics;
 var lightMask;
-var coneColl;
-var angle;
-var lightCircle;
+var darkness;
 
 let keyA, keyS, keyD, keyW;
 
@@ -76,6 +73,7 @@ function create() {
     player.setBounce(0);
     player.setCollideWorldBounds(true);
     player.body.setAllowGravity(false);
+    
 
     // Añadir las animaciones del jugador
 
@@ -120,8 +118,10 @@ function create() {
     this.physics.add.collider(police, platforms);
     this.physics.add.collider(objects, platforms);
     this.physics.add.overlap(player, objects, collectObject, null, this);
-   
     this.physics.add.overlap(player, police, restartGame, null, this);
+
+
+
 
     // Configurar teclas
     cursors = this.input.keyboard.createCursorKeys();
@@ -131,20 +131,36 @@ function create() {
     keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
     // Añadir la máscara de luz
-     
-
 
     lightMask = this.make.graphics();
     lightMask.fillStyle(0xffffff, 0.3);
     lightMask.fillCircle(150, 150, 150);
     let maskTexture = lightMask.generateTexture('light', 300, 300);
+   
     lightMask.destroy();
 
     let light = this.add.image(player.x, player.y, 'light');
     light.setOrigin(0.5,0.5);
+    light.setDepth(1); // Asegura que la máscara esté encima de los otros elementos
     light.setAlpha(0.8);
     light.setAngle(-45);
     player.light = light;
+
+
+
+
+    
+
+
+    // Oscurecer el fondo
+    darkness = this.add.graphics();
+    darkness.fillStyle(0x000000); // Color negro
+    darkness.fillRect(0, 0, config.width, config.height);
+    darkness.setAlpha(0.9); // Ajusta la opacidad del rectángulo según sea necesario
+    darkness.setDepth(0); // Asegura que esté detrás de los otros elementos
+
+
+
 
     police.children.iterate(function (policeOfficer) {
         
@@ -228,7 +244,8 @@ function update() {
         
         
         //policeOfficer.cone.rotation = policeOfficer.angle; // Ajustar rotación
-    });
+
+    }, this);
 
 
 }
@@ -299,6 +316,10 @@ function collectObject(player, object) {
     object.disableBody(true, true);
     // Lógica para manejar la recolección del objeto
 }
+
+
+
+
 
 function restartGame(player, policeOfficer) {
     // Lógica para reiniciar el juego
