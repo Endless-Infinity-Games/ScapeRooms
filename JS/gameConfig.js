@@ -257,7 +257,7 @@ function create() {
     completeText.setAlpha(0);
 
     exitButton.addEventListener('click', () => {
-        window.location.assign("../index.html");
+        window.location.assign("./index.html");
     });
 
 
@@ -392,7 +392,7 @@ function levelComplete() {
     
     // Aquí podrías agregar lógica para avanzar al siguiente nivel o reiniciar el nivel
     setTimeout(() => {
-        window.location.assign("../index.html"); // Esto hará que la página vuelva a la página anterior en el historial del navegador
+        window.location.assign("./index.html"); // Esto hará que la página vuelva a la página anterior en el historial del navegador
     }, 1000);
 }
 function restartGame(player, policeOfficer) {
@@ -402,7 +402,7 @@ function restartGame(player, policeOfficer) {
     this.physics.pause();
 
     setTimeout(() => {
-        window.location.assign("../index.html");
+        window.location.assign("./index.html");
     }, 1000);
 }
 
