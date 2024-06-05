@@ -34,6 +34,7 @@ function preload ()
     this.load.image('star', '/assets/star.png');
     this.load.image('bomb', '/assets/bomb.png');
     this.load.image('cone', '/assets/cone.png');
+    this.load.image('groundVertical', '/assets/platformGirada.png')
     
     this.load.spritesheet('dude', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('police', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 }); // Usar un sprite diferente para el policía si lo tienes
@@ -45,28 +46,28 @@ function create() {
     this.add.image(400, 300, 'sky');
     platforms = this.physics.add.staticGroup();
     //platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-    platforms.create(300, 748, 'ground').setAngle(90).refreshBody();
-    platforms.create(400, 412, 'ground').setAngle(90).refreshBody();
     platforms.create(44, 248, 'ground').refreshBody();
-    platforms.create(140, -15, 'ground').setAngle(90).refreshBody();
-    platforms.create(400, 748, 'ground').setAngle(90).refreshBody();
-    platforms.create(510, 148, 'ground').refreshBody();
-    platforms.create(650, 228, 'ground').refreshBody();
-    platforms.create(300, 638, 'ground').setAngle(90).refreshBody();
-    platforms.create(300, 198, 'ground').setAngle(90).refreshBody();
+    platforms.create(510, 130, 'ground').refreshBody();
+    platforms.create(670, 228, 'ground').refreshBody();
     platforms.create(600, 564, 'ground').refreshBody();
     platforms.create(100, 564, 'ground').refreshBody();
-    platforms.create(16, 364, 'ground').setAngle(90).refreshBody();
-    platforms.create(16, 164, 'ground').setAngle(90).refreshBody();
-    platforms.create(784, 364, 'ground').setAngle(90).refreshBody();
-    platforms.create(784, 164, 'ground').setAngle(90).refreshBody();
     platforms.create(600, 10, 'ground').refreshBody();
     platforms.create(200, 10, 'ground').refreshBody();
-    //platforms.create(600, 400, 'ground');
-    //platforms.create(50, 250, 'ground');
-    //platforms.create(750, 220, 'ground');
-    //platforms.create(400, 100, 'ground');
 
+
+    platforms.create(300, 748, 'groundVertical').refreshBody();
+    platforms.create(400, 412, 'groundVertical').refreshBody();
+    platforms.create(140, -25, 'groundVertical').refreshBody();
+    platforms.create(400, 748, 'groundVertical').refreshBody();
+    platforms.create(300, 638, 'groundVertical').refreshBody();
+    platforms.create(300, 175, 'groundVertical').refreshBody();
+    platforms.create(16, 364, 'groundVertical').refreshBody();
+    platforms.create(16, 364, 'groundVertical').refreshBody();
+    platforms.create(784, 364, 'groundVertical').refreshBody();
+    platforms.create(784, 164, 'groundVertical').refreshBody();
+    platforms.create(16, 164, 'groundVertical').refreshBody();
+
+    
     // Añadir el jugador
     player = this.physics.add.sprite(100, 450, 'dude');
     player.setOrigin(0.5,0.5); //Ajustar centro del personaje
@@ -248,6 +249,24 @@ function update() {
     }, this);
 
 
+}
+
+
+
+
+function createWall(scene, x, y, isVertical) {
+    const wall = scene.physics.add.staticImage(x, y, 'ground');
+    wall.visible = false; // Hacer la pared invisible
+
+    if (isVertical) {
+        wall.setSize(wall.height, wall.width); // Cambiar el tamaño del cuerpo de colisión
+        wall.body.setSize(wall.width, wall.height); // Asegurarse de que el cuerpo tenga el tamaño correcto
+        wall.angle = 90; // Rotar la imagen visible
+    }
+
+    const wallImage = scene.add.image(x, y, 'ground');
+    wallImage.angle = isVertical ? 90 : 0;
+    wallImage.setOrigin(0.5, 0.5);
 }
 
 
