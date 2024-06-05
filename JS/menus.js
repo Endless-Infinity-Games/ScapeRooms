@@ -1,9 +1,10 @@
 
-// Lógica del menú
+
 document.getElementById('start-game').addEventListener('click', 
     function(){
         window.location.assign("./html/phasergame.html");
     });
+
 
 document.addEventListener('DOMContentLoaded', function () {
     var logoImage = document.getElementById('logo-image');
