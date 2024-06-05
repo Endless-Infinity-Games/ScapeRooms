@@ -4,9 +4,7 @@
 
     window.location.assign("./html/phasergame.html");
 });*/
-
-document.getElementById('play').addEventListener('click', 
+document.getElementById('start-game').addEventListener('click', 
     function(){
-        sessionStorage.removeItem("save");
         window.location.assign("./html/phasergame.html");
     });
