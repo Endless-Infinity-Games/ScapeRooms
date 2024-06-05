@@ -2,7 +2,7 @@
 
 document.getElementById('start-game').addEventListener('click', 
     function(){
-        window.location.assign("./html/phasergame.html");
+        window.location.assign("phasergame.html");
     });
 
 
