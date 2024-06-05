@@ -26,6 +26,8 @@ var platforms;
 var cursors;
 var objects;
 var lightMask;
+
+
 var darkness;
 let starsCollected = 0;
 let totalStars = 0;
@@ -33,12 +35,17 @@ var completeText;
 
 
 
+
 let keyA, keyS, keyD, keyW;
+let isPaused = false;
+let pauseButton;
+let pauseMenu;
+let resumeButton;
+let exitButton;
 
 var game = new Phaser.Game(config);
 
-function preload ()
-{
+function preload () {
     this.load.image('sky', '/assets/sky.png');
     this.load.image('ground', '/assets/platform.png');
     this.load.image('star', '/assets/star.png');
@@ -47,14 +54,14 @@ function preload ()
     this.load.image('groundVertical', '/assets/platformGirada.png')
     
     this.load.spritesheet('dude', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('police', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 }); // Usar un sprite diferente para el policía si lo tienes
+    this.load.spritesheet('police', '/assets/dude.png', { frameWidth: 32, frameHeight: 48 });
 }
 
-
 function create() {
-    // Añadir el fondo y las plataformas
     this.add.image(400, 300, 'sky');
     platforms = this.physics.add.staticGroup();
+
+
     //platforms.create(400, 568, 'ground').setScale(2).refreshBody();
     platforms.create(44, 248, 'ground').refreshBody();
     platforms.create(510, 130, 'ground').refreshBody();
@@ -80,14 +87,13 @@ function create() {
     
     
     // Añadir el jugador
+
     player = this.physics.add.sprite(100, 450, 'dude');
-    player.setOrigin(0.5,0.5); //Ajustar centro del personaje
+    player.setOrigin(0.5,0.5);
     player.setBounce(0);
     player.setCollideWorldBounds(true);
     player.body.setAllowGravity(false);
     
-
-    // Añadir las animaciones del jugador
 
     this.anims.create({
         key: 'left',
@@ -109,8 +115,11 @@ function create() {
         repeat: -1
     });
 
-    // Añadir los policías
     police = this.physics.add.group();
+
+    addPolice(400, 300, 100, this);
+    addPolice(300, 500, 200, this);
+
     addPolice(600, 500, 100, this); // Añade un policía en la posición (400, 300) con una distancia de patrulla de 100 píxeles
     addPolice(500, 175, 120, this);
     addPolice(150, 200, 90, this);
@@ -124,6 +133,7 @@ function create() {
         { x: 500, y: 300 },
         { x: 600, y: 350 }*/
     ];
+
 
     objects = this.physics.add.group({
         key: 'star',
@@ -141,22 +151,25 @@ function create() {
         i++;
     });
 
-    // Añadir colisiones
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(police, platforms);
     this.physics.add.collider(objects, platforms);
     this.physics.add.overlap(player, objects, collectObject, null, this);
+
+
     this.physics.add.overlap(player, police, restartGame, null, this);
 
 
 
 
-    // Configurar teclas
+
     cursors = this.input.keyboard.createCursorKeys();
     keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+
+
 
     // Añadir la máscara de luz
 
@@ -168,9 +181,14 @@ function create() {
     lightMask.destroy();
 
     let light = this.add.image(player.x, player.y, 'light');
+
+    light.setOrigin(0.5, 0.5);
+    light.setAlpha(0.8);
+
     light.setOrigin(0.5,0.5);
     light.setDepth(2); // Asegura que la máscara esté encima de los otros elementos
     light.setAlpha(0.5);
+
     light.setAngle(-45);
     player.light = light;
     
@@ -188,14 +206,25 @@ function create() {
 
     police.children.iterate(function (policeOfficer) {
         
-        //Cono dibujado
-        /*
-        let coneGraphics = policeOfficer.scene.add.graphics();
-        coneGraphics.fillStyle(0xffffff, 0.2);
-        coneGraphics.slice(0, 0, 150, Phaser.Math.DegToRad(-45), Phaser.Math.DegToRad(45), false);
-        coneGraphics.fillPath();
-        policeOfficer.cone = coneGraphics;
-*/
+    
+    pauseButton = document.getElementById('pause-button');
+    pauseMenu = document.getElementById('pause-menu');
+    resumeButton = document.getElementById('resume-button');
+    exitButton = document.getElementById('exit-button');
+
+    pauseButton.addEventListener('click', () => {
+        this.scene.pause();
+        isPaused = true;
+        pauseMenu.style.display = 'block';
+    });
+
+    resumeButton.addEventListener('click', () => {
+        this.scene.resume();
+        isPaused = false;
+        pauseMenu.style.display = 'none';
+    });
+
+
         //Imagen de un cono
         policeOfficer.cone = policeOfficer.scene.physics.add.image(policeOfficer.x, policeOfficer.y, 'cone');
         policeOfficer.cone.setOrigin(1, 0.5);
@@ -219,14 +248,28 @@ function create() {
     completeText = this.add.text(400, 300, 'Level Complete!', { fontSize: '32px', fill: '#ffffff' });
     completeText.setAlpha(0);
 
+
+    exitButton.addEventListener('click', () => {
+        window.location.assign("../index.html");
+    });
 }
 
 function update() {
+    if (isPaused) return;
+
     player.setVelocity(0);
-    // Movimiento del jugador
     if (cursors.left.isDown || keyA.isDown) {
         player.setVelocityX(-160);
         player.anims.play('left', true);
+
+    } else if (cursors.right.isDown || keyD.isDown) {
+        player.setVelocityX(160);
+        player.anims.play('right', true);
+    } else if (cursors.up.isDown || keyW.isDown) {
+        player.setVelocityY(-160);
+    } else if (cursors.down.isDown || keyS.isDown) {
+        player.setVelocityY(160);
+
        
     } else if (cursors.right.isDown || keyD.isDown) {
         player.setVelocityX(160);
@@ -238,29 +281,24 @@ function update() {
     } else if (cursors.down.isDown || keyS.isDown) {
             player.setVelocityY(160);
     
+
     } else {
         player.setVelocityX(0);
         player.anims.play('turn');
     }
 
-    if ((cursors.up.isDown || keyW.isDown) && player.body.touching.down) {
-        player.setVelocityY(-330);
-    }
-
-    // Actualizar la posición de la luz del jugador
-    /*lightCircle.x= player.x;
-    lightCircle.y= player.y;
-    console.log(lightCircle.x,player.x);*/
     player.light.x = player.x;
     player.light.y = player.y;
 
-
     police.children.iterate(function (policeOfficer) {
         patrol(policeOfficer);
-        // Actualizar la posición y ángulo del cono
-
         policeOfficer.cone.x = policeOfficer.x;
         policeOfficer.cone.y = policeOfficer.y;
+
+    });
+}
+
+
         
         //policeOfficer.cone.rotation = policeOfficer.angle; // Ajustar rotación
 
@@ -293,6 +331,7 @@ function addStar(x,y,scene) {
 
 }
 
+
 function addPolice(x, y, distance, scene) {
     var policeOfficer = scene.physics.add.sprite(x, y, 'police');
     policeOfficer.setBounce(0.2);
@@ -300,9 +339,8 @@ function addPolice(x, y, distance, scene) {
     policeOfficer.startX = x;
     policeOfficer.startY = y;
     policeOfficer.distance = distance;
-    policeOfficer.direction = 1; // 1 para derecha, -1 para izquierda
+    policeOfficer.direction = 1;
 
-    // Animaciones del policía (similar al jugador)
     scene.anims.create({
         key: 'police_left',
         frames: scene.anims.generateFrameNumbers('police', { start: 0, end: 3 }),
@@ -327,10 +365,14 @@ function addPolice(x, y, distance, scene) {
 }
 
 function patrol(policeOfficer) {
-  
-
     if (policeOfficer.direction === 1 && policeOfficer.x >= policeOfficer.startX + policeOfficer.distance) {
         policeOfficer.direction = -1;
+
+        policeOfficer.cone.setAngle(-180);
+    } else if (policeOfficer.direction === -1 && policeOfficer.x <= policeOfficer.startX - policeOfficer.distance) {
+        policeOfficer.direction = 1;
+        policeOfficer.cone.setAngle(0);
+
         policeOfficer.cone.setAngle(0); // Rotar ángulo
         policeOfficer.cone.body.setOffset(-160, 150)
          
@@ -338,22 +380,22 @@ function patrol(policeOfficer) {
         policeOfficer.direction = 1;
         policeOfficer.cone.setAngle(180); // Rotar 
         policeOfficer.cone.body.setOffset(300, 150)
+
     }
     //Velocidad que alcanzan los policias
     policeOfficer.setVelocityX(30 * policeOfficer.direction);
     if (policeOfficer.direction === 1) {
         policeOfficer.anims.play('police_right', true);
-      
     } else {
         policeOfficer.anims.play('police_left', true);
-       
     }
-
-    
 }
 
 function collectObject(player, object) {
     object.disableBody(true, true);
+
+}
+
     starsCollected += 1;
 
     if (starsCollected === totalStars) {
@@ -384,3 +426,4 @@ function restartGame(player, policeOfficer) {
         this.scene.restart();
     }, 1000);
 }
+
